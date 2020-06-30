@@ -1,43 +1,43 @@
+mod shapes ;
+
 #[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32
+enum Shape {
+    Rectangle(shapes::Rectangle),
+    Triangle(shapes::Triangle),
+    Circle(shapes::Circle)
 }
 
-impl Rectangle {
-    /// Function to generate a square.
-    fn create_square(size: u32) -> Rectangle {
-        Rectangle {
-            width: size,
-            height: size
+impl Shape {
+    fn print(&self) {
+        match self {
+            Shape::Rectangle(shape) => println!(
+                "The rectangle area is {} pixel^2",
+                shape.area()
+            ),
+            Shape::Triangle(shape) => println!(
+                "The {} area is {} pixel^2",
+                if shape.is_right() { "right triangle" } else { "triangle" },
+                shape.area()
+            ),
+            Shape::Circle(shape) => println!(
+                "The circle area is {} pixel^2",
+                shape.area()
+            ),
+            _ => println!("This is an unknown shape...")
         }
-    }
-
-    /// Get the area of the current rectangle.
-    fn area(&self) -> u32 {
-        self.width * self.height
-    }
-
-    /// Test if the current rectangle can entirely hold another one.
-    fn can_hold(&self, other: &Rectangle) -> bool {
-        (self.width > other.width) && (self.height > other.height)
     }
 }
 
 fn main() {
-    let rect1 = Rectangle {
-        width: 50,
-        height: 30
-    } ;
-    println!("The area of a {:#?} is {} square pixels.", rect1, rect1.area()) ;
+    let testRect: Shape = Shape::Rectangle(shapes::Rectangle::create(78, 42)) ;
+    testRect.print() ;
 
-    let rect2 = Rectangle {
-        width: 30,
-        height: 10
-    } ;
-    println!("{:?} contains {:?}? {}", rect1, rect2, rect1.can_hold(&rect2)) ;
+    let testCircle: Shape = Shape::Circle(shapes::Circle::create(5_f32)) ;
+    testCircle.print() ;
 
-    let rect3 = Rectangle::create_square(20) ;
-    println!("{:?} contains {:?}? {}", rect1, rect3, rect1.can_hold(&rect3)) ;
-    println!("{:?} contains {:?}? {}", rect3, rect1, rect3.can_hold(&rect1)) ;
+    let testRightTriangle: Shape = Shape::Triangle(shapes::Triangle::create(12, 8, true)) ;
+    testRightTriangle.print() ;
+
+    let testTriangle: Shape = Shape::Triangle(shapes::Triangle::create(12, 8, false)) ;
+    testTriangle.print() ;
 }
