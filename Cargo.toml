@@ -1,10 +1,15 @@
 [package]
-name = "guessing_game"
-version = "0.1.0"
-authors = ["dcarlus <denis.carlus@hotmail.fr>"]
+name = "yapg"
+version = "0.0.1"
+authors = ["Denis CARLUS"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-rand = "0.5.5"
+amethyst = "0.15.0"
+log = { version = "0.4.8", features = ["serde"] }
+
+[features]
+default = ["vulkan"]
+empty = ["amethyst/empty"]
+metal = ["amethyst/metal"]
+vulkan = ["amethyst/vulkan"]

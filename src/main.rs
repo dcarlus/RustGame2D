@@ -1,43 +1,44 @@
-mod shapes ;
+use amethyst::{
+    core::transform::TransformBundle,
+    core::frame_limiter::FrameRateLimitStrategy,
+    prelude::*,
+    renderer::{
+        plugins::{RenderFlat2D, RenderToWindow},
+        types::DefaultBackend,
+        RenderingBundle,
+    },
+    utils::application_root_dir,
+};
 
-#[derive(Debug)]
-enum Shape {
-    Rectangle(shapes::Rectangle),
-    Triangle(shapes::Triangle),
-    Circle(shapes::Circle)
-}
+mod state;
 
-impl Shape {
-    fn print(&self) {
-        match self {
-            Shape::Rectangle(shape) => println!(
-                "The rectangle area is {} pixel^2",
-                shape.area()
-            ),
-            Shape::Triangle(shape) => println!(
-                "The {} area is {} pixel^2",
-                if shape.is_right() { "right triangle" } else { "triangle" },
-                shape.area()
-            ),
-            Shape::Circle(shape) => println!(
-                "The circle area is {} pixel^2",
-                shape.area()
-            ),
-            _ => println!("This is an unknown shape...")
-        }
-    }
-}
+fn main() -> amethyst::Result<()> {
+    amethyst::start_logger(Default::default());
 
-fn main() {
-    let testRect: Shape = Shape::Rectangle(shapes::Rectangle::create(78, 42)) ;
-    testRect.print() ;
+    let app_root = application_root_dir()?;
 
-    let testCircle: Shape = Shape::Circle(shapes::Circle::create(5_f32)) ;
-    testCircle.print() ;
+    let resources = app_root.join("resources");
+    let display_config = resources.join("display_config.ron");
 
-    let testRightTriangle: Shape = Shape::Triangle(shapes::Triangle::create(12, 8, true)) ;
-    testRightTriangle.print() ;
+    let game_data = GameDataBuilder::default()
+        .with_bundle(TransformBundle::new())?
+        .with_bundle(
+            RenderingBundle::<DefaultBackend>::new()
+                .with_plugin(
+                    RenderToWindow::from_config_path(display_config)?
+                        .with_clear([0.34, 0.36, 0.52, 1.0]),
+                )
+                .with_plugin(RenderFlat2D::default()),
+        )?;
 
-    let testTriangle: Shape = Shape::Triangle(shapes::Triangle::create(12, 8, false)) ;
-    testTriangle.print() ;
+    let mut game = Application::build(resources, state::MyState)?
+        .with_frame_limit(
+            FrameRateLimitStrategy::Sleep,
+            60,
+        )
+        .build(game_data)?;
+
+    game.run();
+
+    Ok(())
 }
